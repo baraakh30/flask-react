@@ -4,8 +4,8 @@ setup(
     name='flask-react',
     version='0.1.0',
     description='A Flask extension for server-side React component rendering',
-    author='Your Name',
-    author_email='your.email@example.com',
+    author='Baraa Khanfar',
+    author_email='baraa60@icloud.com',
     packages=find_packages(),
     install_requires=[
         'Flask>=2.0.0',
