@@ -74,17 +74,17 @@ class NodeRenderer:
             # 3. In current working directory
             Path.cwd() / "ssr_server.js",
         ]
-        
+
         for script_path in possible_locations:
             if script_path.exists():
                 self.ssr_script_path = script_path
                 # This is a bundled/existing script, not temporary
                 self._is_temp_script = False
                 return
-        
+
         # Fallback: create a basic SSR script in a temporary location
         import tempfile
-        
+
         temp_dir = Path(tempfile.gettempdir())
         self._create_fallback_ssr_script(temp_dir)
         # Mark this as a temporary script that should be cleaned up
