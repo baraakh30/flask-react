@@ -37,8 +37,8 @@ class NodeRenderer:
         self.node_executable = node_executable
         self.timeout = timeout
 
-        self._component_cache = {}
-        self._component_mtimes = {}
+        self._component_cache: Dict[str, str] = {}
+        self._component_mtimes: Dict[str, float] = {}
 
         # Ensure Node.js is available
         self._check_node_availability()
@@ -193,7 +193,7 @@ if (process.argv.length >= 3) {
             f.write(ssr_script_content)
 
     def render_component(
-        self, component_name: str, props: Dict[str, Any] = None
+        self, component_name: str, props: Optional[Dict[str, Any]] = None
     ) -> str:
         """
         Render a React component to HTML string using Node.js.
@@ -261,7 +261,10 @@ if (process.argv.length >= 3) {
                 error_msg = error_info.get("message", "Unknown rendering error")
                 raise RenderError(f"Component rendering failed: {error_msg}")
 
-            return result["html"]
+            html_result = result.get("html")
+            if html_result is None:
+                raise RenderError("No HTML content in rendering result")
+            return str(html_result)
 
         except subprocess.TimeoutExpired:
             raise RenderError(

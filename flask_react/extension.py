@@ -104,8 +104,8 @@ class FlaskReact:
     def render_component(
         self,
         component_name: str,
-        props: Dict[str, Any] = None,
-        template_data: Dict[str, Any] = None,
+        props: Optional[Dict[str, Any]] = None,
+        template_data: Optional[Dict[str, Any]] = None,
     ) -> str:
         """
         Render a React component to HTML string.
@@ -127,7 +127,11 @@ class FlaskReact:
         else:
             processed_props = props or {}
 
-        return self._renderer.render_component(component_name, processed_props)
+        if self._renderer is None:
+            raise RuntimeError("Flask-React not properly initialized")
+
+        result = self._renderer.render_component(component_name, processed_props)
+        return str(result)
 
     def render_template(self, component_name: str, **context) -> str:
         """
@@ -191,6 +195,9 @@ class FlaskReact:
         """Get information about a specific component."""
         if self._renderer is None:
             self._init_renderer()
+
+        if self._renderer is None:
+            raise RuntimeError("Flask-React not properly initialized")
         return self._renderer.get_component_info(component_name)
 
     @property
@@ -204,9 +211,9 @@ class FlaskReact:
 # Convenience function for creating responses
 def react_response(
     component_name: str,
-    props: Dict[str, Any] = None,
+    props: Optional[Dict[str, Any]] = None,
     status_code: int = 200,
-    headers: Dict[str, str] = None,
+    headers: Optional[Dict[str, str]] = None,
 ):
     """
     Create a Flask response with rendered React component.
