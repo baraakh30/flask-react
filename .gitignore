@@ -83,3 +83,4 @@ yarn-error.log*
 package-lock.json
 setup_node.py
 MANIFEST.in
+GITHUB_TOKENS_SETUP.md
