@@ -3,13 +3,12 @@ from setuptools import setup, find_packages
 setup(
     name='flask-react',
     version='0.1.0',
-    description='A Flask extension for server-side React component rendering',
+    description='A Flask extension for server-side React component rendering using Node.js',
     author='Baraa Khanfar',
     author_email='baraa60@icloud.com',
     packages=find_packages(),
     install_requires=[
         'Flask>=2.0.0',
-        'PyExecJS>=1.5.1',
         'Jinja2>=3.0.0',
     ],
     extras_require={

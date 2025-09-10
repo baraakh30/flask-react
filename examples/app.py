@@ -7,6 +7,7 @@ from flask_react import FlaskReact
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your-secret-key'
+app.config['FLASK_REACT_COMPONENTS_DIR'] = 'components'
 
 # Initialize Flask-React
 react = FlaskReact(app)
@@ -51,7 +52,6 @@ def user_list():
         can_edit=current_user['role'] == 'admin',
         page_title='User Management'
     )
-
 
 @app.route('/user/<int:user_id>')
 def user_detail(user_id):

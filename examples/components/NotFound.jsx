@@ -1,3 +1,5 @@
+const React = require('react');
+
 function NotFound({ message }) {
     return (
         <div className="not-found">
@@ -90,3 +92,4 @@ function NotFound({ message }) {
         </div>
     );
 }
+module.exports = NotFound;

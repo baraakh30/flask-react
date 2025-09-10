@@ -2,16 +2,18 @@
 
 ## Overview
 
-Flask-React is a Flask extension that enables server-side rendering of React components with template-like functionality similar to Jinja2. It allows you to use React components as templates while maintaining the ability to use conditions, loops, and data binding.
+Flask-React is a Flask extension that enables server-side rendering of React components with template-like functionality similar to Jinja2. It uses Node.js for fast and reliable React component rendering on the server-side.
 
 ## Features
 
-- **Server-side React rendering**: Render React components on the server using PyExecJS
+- **Server-side React rendering**: Render React components on the server using Node.js subprocess
 - **Template-like syntax**: Support for conditions, loops, and data binding like Jinja2
 - **Flask integration**: Seamless integration with Flask applications
 - **Component caching**: Cache compiled components for better performance
 - **Props passing**: Pass data from Flask routes to React components
 - **Development-friendly**: Hot reloading and error handling
+- **Fast Node.js engine**: Direct Node.js subprocess for optimal performance
+- **Flexible component support**: Support for .jsx, .js, .ts, .tsx files
 
 ## Installation
 
@@ -22,22 +24,33 @@ pip install flask-react
 ### Dependencies
 
 - Flask >= 2.0.0
-- PyExecJS >= 1.5.1
 - Jinja2 >= 3.0.0
+- Node.js (required for server-side rendering)
 
-### JavaScript Runtime
+### Node.js Setup
 
-Flask-React requires a JavaScript runtime to execute React components. Install one of the following:
+Flask-React requires Node.js to execute React components. **Node.js is mandatory** for this extension:
 
-**Node.js (Recommended)**:
+**Install Node.js**:
 ```bash
-# Install Node.js from https://nodejs.org/
+# Download and install from https://nodejs.org/
+# Verify installation:
+node --version
+npm --version
 ```
 
-**Other options**:
-- PyV8
-- Microsoft's ChakraCore
-- Any ExecJS-supported runtime
+**Install React dependencies**:
+The Flask-React package includes a `package.json` with all required dependencies. Simply run:
+```bash
+npm install
+```
+
+This will install:
+- `react` and `react-dom` (for React SSR)
+- `@babel/core`, `@babel/preset-react` (for JSX transformation)
+- `@babel/preset-env` (for modern JavaScript features)
+- `@babel/preset-typescript` (for TypeScript support)
+- `@babel/register` (for runtime JSX compilation)
 
 ## Quick Start
 
@@ -88,6 +101,114 @@ def home():
     )
 ```
 
+## Setup Guide
+
+### Complete Setup from Scratch
+
+1. **Install Node.js**:
+   ```bash
+   # Visit https://nodejs.org/ and install Node.js
+   # Verify installation:
+   node --version  # Should show v16.0.0 or higher
+   npm --version
+   ```
+
+2. **Create Flask project**:
+   ```bash
+   mkdir my-flask-react-app
+   cd my-flask-react-app
+   python -m venv venv
+   
+   # Activate virtual environment
+   # Windows:
+   venv\Scripts\activate
+   # Linux/Mac:
+   source venv/bin/activate
+   ```
+
+3. **Install Python dependencies**:
+   ```bash
+   pip install flask-react flask
+   ```
+
+4. **Install Node.js dependencies**:
+   ```bash
+   # Copy package.json from Flask-React installation or create your own
+   # If using Flask-React package.json:
+   npm install
+   
+   # Or if creating from scratch:
+   npm init -y
+   npm install react react-dom @babel/core @babel/preset-react @babel/register
+   ```
+
+5. **Create project structure**:
+   ```bash
+   mkdir components
+   mkdir templates
+   touch app.py
+   ```
+
+6. **Create a basic Flask app** (`app.py`):
+   ```python
+   from flask import Flask
+   from flask_react import FlaskReact
+   
+   app = Flask(__name__)
+   react = FlaskReact(app)
+   
+   @app.route('/')
+   def index():
+       return react.render_component('HelloWorld', {
+           'name': 'World',
+           'message': 'Welcome to Flask-React!'
+       })
+   
+   if __name__ == '__main__':
+       app.run(debug=True)
+   ```
+
+7. **Create your first component** (`components/HelloWorld.jsx`):
+   ```jsx
+   function HelloWorld({ name, message }) {
+       return (
+           <div style={{ padding: '20px', textAlign: 'center' }}>
+               <h1>Hello {name}!</h1>
+               <p>{message}</p>
+           </div>
+       );
+   }
+   
+   module.exports = HelloWorld;
+   ```
+
+8. **Run the application**:
+   ```bash
+   python app.py
+   ```
+
+### Troubleshooting Setup
+
+#### Node.js Issues
+- **"Node.js not found"**: Ensure Node.js is in your PATH or set explicit path:
+  ```python
+  app.config['FLASK_REACT_NODE_EXECUTABLE'] = '/usr/local/bin/node'  # Linux/Mac
+  app.config['FLASK_REACT_NODE_EXECUTABLE'] = 'C:\\Program Files\\nodejs\\node.exe'  # Windows
+  ```
+
+- **Permission errors**: Ensure the Node.js executable has proper permissions
+
+#### Component Issues
+- **"Component not found"**: Check file names and extensions (.jsx, .js, .ts, .tsx)
+- **Syntax errors**: Ensure your JSX is valid and components are properly exported
+
+#### Babel Issues
+- **JSX transformation errors**: Ensure dependencies are installed:
+  ```bash
+  npm install  # Installs all dependencies from package.json
+  ```
+- **Babel configuration**: The package.json includes proper Babel presets configuration
+
 ## Configuration
 
 Configure Flask-React using standard Flask configuration:
@@ -95,7 +216,8 @@ Configure Flask-React using standard Flask configuration:
 ```python
 app.config['FLASK_REACT_COMPONENTS_DIR'] = 'components'  # Component directory
 app.config['FLASK_REACT_CACHE_COMPONENTS'] = True       # Enable component caching
-app.config['FLASK_REACT_BABEL_PRESETS'] = ['@babel/preset-react']  # Babel presets
+app.config['FLASK_REACT_NODE_EXECUTABLE'] = 'node'      # Node.js executable path
+app.config['FLASK_REACT_NODE_TIMEOUT'] = 30             # Node.js process timeout (seconds)
 app.config['FLASK_REACT_AUTO_RELOAD'] = app.debug       # Auto-reload in debug mode
 ```
 
@@ -104,8 +226,9 @@ app.config['FLASK_REACT_AUTO_RELOAD'] = app.debug       # Auto-reload in debug m
 | Option | Default | Description |
 |--------|---------|-------------|
 | `FLASK_REACT_COMPONENTS_DIR` | `'components'` | Directory containing React components |
-| `FLASK_REACT_CACHE_COMPONENTS` | `True` | Enable component caching |
-| `FLASK_REACT_BABEL_PRESETS` | `['@babel/preset-react']` | Babel presets for JSX transformation |
+| `FLASK_REACT_CACHE_COMPONENTS` | `True` | Enable component caching (affects both Python and Node.js caching) |
+| `FLASK_REACT_NODE_EXECUTABLE` | `'node'` | Path to Node.js executable |
+| `FLASK_REACT_NODE_TIMEOUT` | `30` | Timeout for Node.js processes in seconds |
 | `FLASK_REACT_AUTO_RELOAD` | `app.debug` | Auto-reload components in debug mode |
 
 ## Usage Examples
@@ -275,18 +398,21 @@ List all available React components.
 ##### `clear_cache()`
 Clear the component cache.
 
-### ReactRenderer Class
+### NodeRenderer Class
 
 #### Methods
 
 ##### `render_component(component_name, props=None)`
-Render a React component to HTML string.
+Render a React component to HTML string using Node.js subprocess.
 
 ##### `list_components()`
-List all available components.
+List all available components in the components directory.
 
 ##### `clear_cache()`
 Clear the component cache.
+
+##### `get_component_info(component_name)`
+Get detailed information about a specific component including file path, size, and modification time.
 
 ### Template Globals
 
@@ -308,7 +434,7 @@ Create a Flask response with rendered React component.
 - `FlaskReactError`: Base exception for Flask-React errors
 - `ComponentNotFoundError`: Raised when a component cannot be found
 - `RenderError`: Raised when component rendering fails
-- `JavaScriptEngineError`: Raised when there's an issue with the JS runtime
+- `JavaScriptEngineError`: Raised when there's an issue with Node.js
 - `ComponentCompileError`: Raised when component compilation fails
 
 ### Error Handling Example
@@ -331,22 +457,28 @@ def render_component(component_name):
 
 ### Component Caching
 
-Components are cached by default to improve performance:
+Components are cached by default to improve performance. This affects both Python-level caching and Node.js Babel compilation caching:
 
 ```python
-# Disable caching in development
+# Disable caching in development (affects both Python and Node.js caching)
 app.config['FLASK_REACT_CACHE_COMPONENTS'] = not app.debug
 
-# Clear cache manually
+# Clear cache manually (Python-level cache only)
 react.clear_cache()
 ```
+
+When `FLASK_REACT_CACHE_COMPONENTS` is `False`:
+- Python-level component cache is disabled
+- Node.js require cache is cleared on each render for hot reloading
+- Babel compilation cache is disabled
 
 ### Production Optimization
 
 1. **Enable caching**: Keep `FLASK_REACT_CACHE_COMPONENTS = True` in production
-2. **Use a fast JS runtime**: Node.js is recommended for best performance
+2. **Optimize Node.js timeout**: Set appropriate `FLASK_REACT_NODE_TIMEOUT` based on component complexity
 3. **Minimize component complexity**: Keep components simple for faster rendering
 4. **Consider client-side hydration**: For interactive components
+5. **Use Node.js process pools**: For high-traffic applications, consider implementing process pooling
 
 ## Development Tips
 
@@ -406,10 +538,11 @@ react.render_template('layout/Header')
 ## Limitations
 
 1. **Server-side only**: Components are rendered server-side; no client-side interactivity
-2. **JavaScript runtime dependency**: Requires a JavaScript runtime (Node.js recommended)
+2. **Node.js dependency**: Requires Node.js to be installed and accessible
 3. **No React hooks**: Server-side rendering doesn't support React hooks
 4. **Limited React features**: Some React features may not work in server-side context
 5. **Performance overhead**: Server-side rendering adds computational overhead
+6. **Process overhead**: Each render creates a new Node.js subprocess
 
 ## Migration Guide
 

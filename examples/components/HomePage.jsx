@@ -1,3 +1,5 @@
+const React = require('react');
+
 function HomePage(props) {
     var title = props.title;
     var subtitle = props.subtitle;
@@ -100,3 +102,5 @@ function HomePage(props) {
         ])
     ]);
 }
+
+module.exports = HomePage;

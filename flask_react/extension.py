@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional
 from flask import Flask, render_template_string, current_app, request
 from jinja2 import Template
 
-from .renderer import ReactRenderer
+from .node_renderer import NodeRenderer
 from .exceptions import FlaskReactError
 
 
@@ -44,7 +44,8 @@ class FlaskReact:
         app.config.setdefault('FLASK_REACT_MAX_CACHE_SIZE', 100)
         app.config.setdefault('FLASK_REACT_BABEL_PRESETS', ['@babel/preset-react'])
         app.config.setdefault('FLASK_REACT_AUTO_RELOAD', app.debug)
-        
+        app.config.setdefault('FLASK_REACT_NODE_TIMEOUT', 30)
+        app.config.setdefault('FLASK_REACT_NODE_EXECUTABLE', 'node')
         # Initialize renderer
         self._init_renderer()
         
@@ -58,20 +59,22 @@ class FlaskReact:
         """Initialize the React renderer."""
         components_dir = self.app.config['FLASK_REACT_COMPONENTS_DIR']
         cache_enabled = self.app.config['FLASK_REACT_CACHE_COMPONENTS']
-        performance_monitoring = self.app.config['FLASK_REACT_PERFORMANCE_MONITORING']
-        max_cache_size = self.app.config['FLASK_REACT_MAX_CACHE_SIZE']
         
         # Make components directory absolute if it's relative
         if not os.path.isabs(components_dir):
             components_dir = os.path.join(self.app.root_path, components_dir)
         
-        self._renderer = ReactRenderer(
-            components_dir=components_dir,
-            cache_enabled=cache_enabled,
-            performance_monitoring=performance_monitoring,
-            max_cache_size=max_cache_size
-        )
-    
+            # Node.js-based renderer 
+        node_executable = self.app.config['FLASK_REACT_NODE_EXECUTABLE']
+        timeout = self.app.config['FLASK_REACT_NODE_TIMEOUT']
+            
+        self._renderer = NodeRenderer(
+                components_dir=components_dir,
+                cache_enabled=cache_enabled,
+                node_executable=node_executable,
+                timeout=timeout
+            )
+
     def _add_template_globals(self):
         """Add React-related functions to Jinja2 template globals."""
         @self.app.template_global()
@@ -176,9 +179,15 @@ class FlaskReact:
         if self._renderer is not None:
             self._renderer.clear_cache()
     
+    def get_component_info(self, component_name: str):
+        """Get information about a specific component."""
+        if self._renderer is None:
+            self._init_renderer()
+        return self._renderer.get_component_info(component_name)
+    
     @property
-    def renderer(self) -> ReactRenderer:
-        """Get the underlying ReactRenderer instance."""
+    def renderer(self):
+        """Get the underlying renderer instance (ReactRenderer or NodeRenderer)."""
         if self._renderer is None:
             self._init_renderer()
         return self._renderer

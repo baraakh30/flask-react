@@ -1,3 +1,5 @@
+const React = require('react');
+
 function UserList(props) {
     var users = props.users;
     var current_user = props.current_user;
@@ -185,3 +187,5 @@ function UserList(props) {
             }, React.createElement('p', null, 'No users found.'))
     ]);
 }
+
+module.exports = UserList;

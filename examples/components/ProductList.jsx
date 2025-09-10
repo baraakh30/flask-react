@@ -1,3 +1,5 @@
+const React = require('react');
+
 function ProductList({ products, categories, current_category, search_query, total_products, filtered_count }) {
     return (
         <div className="product-list">
@@ -318,3 +320,5 @@ function ProductList({ products, categories, current_category, search_query, tot
         </div>
     );
 }
+
+module.exports = ProductList;

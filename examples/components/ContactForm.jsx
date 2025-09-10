@@ -1,3 +1,5 @@
+const React = require('react');
+
 function ContactForm({ title, fields }) {
     return (
         <div className="contact-form">
@@ -270,3 +272,4 @@ function ContactForm({ title, fields }) {
         </div>
     );
 }
+module.exports = ContactForm;

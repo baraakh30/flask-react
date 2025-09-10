@@ -1,3 +1,5 @@
+const React = require('react');
+
 function Dashboard({ current_user, stats, recent_users, recent_products, is_admin }) {
     return (
         <div className="dashboard">
@@ -340,3 +342,4 @@ function Dashboard({ current_user, stats, recent_users, recent_products, is_admi
         </div>
     );
 }
+module.exports = Dashboard;

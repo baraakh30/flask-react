@@ -1,15 +1,27 @@
 # Flask-React
 
-A Flask extension for server-side React component rendering with template-like functionality.
+A Flask extension for server-side React component rendering with template-like functionality using Node.js.
 
 ## Features
 
-- 🚀 Server-side React component rendering
+- 🚀 Server-side React component rendering with Node.js
 - 🎯 Flask template integration (like Jinja2)
 - 🔄 Support for conditions, loops, and data binding
 - 📦 Component management system
 - 🎨 Props passing and state management
 - 🔧 Easy Flask integration
+- ⚡ Fast Node.js-based rendering engine
+
+## Prerequisites
+
+**Node.js is required** for server-side React rendering. Install Node.js before using this extension:
+
+```bash
+# Install Node.js (https://nodejs.org/)
+# Verify installation:
+node --version
+npm --version
+```
 
 ## Installation
 
@@ -100,10 +112,46 @@ function UserProfile({ user, is_authenticated, permissions }) {
 ## Configuration
 
 ```python
-app.config['FLASK_REACT_COMPONENTS_DIR'] = 'components'
-app.config['FLASK_REACT_BABEL_PRESETS'] = ['@babel/preset-react']
-app.config['FLASK_REACT_CACHE_COMPONENTS'] = True
+# Basic configuration
+app.config['FLASK_REACT_COMPONENTS_DIR'] = 'components'  # Components directory
+app.config['FLASK_REACT_CACHE_COMPONENTS'] = True        # Enable caching
+app.config['FLASK_REACT_NODE_EXECUTABLE'] = 'node'       # Node.js executable path
+app.config['FLASK_REACT_NODE_TIMEOUT'] = 30              # Node.js process timeout
 ```
+
+## Setup for Development
+
+1. **Install Node.js dependencies**:
+```bash
+# Flask-React includes a package.json with all required dependencies
+npm install
+```
+
+2. **Create components directory**:
+```bash
+mkdir components
+```
+
+The `package.json` includes all necessary dependencies:
+- React and ReactDOM for SSR
+- Babel presets for JSX, TypeScript, and modern JavaScript
+- Proper Node.js version requirements (16+)
+
+## Troubleshooting
+
+### Node.js Not Found
+If you get "Node.js not found" errors:
+- Ensure Node.js is installed and in your PATH
+- Set the Node.js path explicitly: `app.config['FLASK_REACT_NODE_EXECUTABLE'] = '/path/to/node'`
+
+### Component Not Found
+- Check that your components are in the correct directory
+- Verify file extensions (.jsx, .js, .ts, .tsx are supported)
+- Ensure component names match file names
+
+### Rendering Timeout
+- Increase timeout: `app.config['FLASK_REACT_NODE_TIMEOUT'] = 60`
+- Check for infinite loops in your components
 
 ## License
 
