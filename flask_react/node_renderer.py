@@ -235,6 +235,7 @@ if (process.argv.length >= 3) {
                 ],
                 capture_output=True,
                 text=True,
+                encoding='utf-8',
                 timeout=self.timeout,
                 cwd=str(project_root),  # Set working directory
             )
