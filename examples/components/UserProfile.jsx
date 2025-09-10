@@ -1,11 +1,7 @@
 const React = require('react');
 
 function UserProfile({ user, current_user, is_own_profile, can_edit }) {
-    props = {
-        'title': '{{ user.name }}\'s Profile',
-        'message': '{{ "Hello " + user.name if user else "Please login" }}',
-        'items': '{{ user.items | tojson }}'
-    }
+    
     if (!user) {
         return (
             <div className="user-profile">

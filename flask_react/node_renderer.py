@@ -43,7 +43,8 @@ class NodeRenderer:
         # Ensure Node.js is available
         self._check_node_availability()
 
-        # Create SSR script
+        # Create SSR script and track if it's temporary
+        self._is_temp_script = False
         self._create_ssr_script()
 
     def _check_node_availability(self):
@@ -64,15 +65,30 @@ class NodeRenderer:
 
     def _create_ssr_script(self):
         """Create or locate the Node.js SSR script."""
-        # First, try to use the bundled SSR server
-        project_root = Path(__file__).parent.parent
-        bundled_script = project_root / "ssr_server.js"
-
-        if bundled_script.exists():
-            self.ssr_script_path = bundled_script
-        else:
-            # Fallback: create a basic SSR script in project directory
-            self._create_fallback_ssr_script(project_root)
+        # Try multiple locations for the SSR server
+        possible_locations = [
+            # 1. Bundled with the package (preferred)
+            Path(__file__).parent / "ssr_server.js",
+            # 2. In the project root (for development)
+            Path(__file__).parent.parent / "ssr_server.js",
+            # 3. In current working directory
+            Path.cwd() / "ssr_server.js",
+        ]
+        
+        for script_path in possible_locations:
+            if script_path.exists():
+                self.ssr_script_path = script_path
+                # This is a bundled/existing script, not temporary
+                self._is_temp_script = False
+                return
+        
+        # Fallback: create a basic SSR script in a temporary location
+        import tempfile
+        
+        temp_dir = Path(tempfile.gettempdir())
+        self._create_fallback_ssr_script(temp_dir)
+        # Mark this as a temporary script that should be cleaned up
+        self._is_temp_script = True
 
     def _create_fallback_ssr_script(self, project_root):
         """Create a fallback SSR script if the main one isn't found."""
@@ -305,7 +321,12 @@ if (process.argv.length >= 3) {
     def __del__(self):
         """Clean up temporary files."""
         try:
-            if hasattr(self, "ssr_script_path") and self.ssr_script_path.exists():
+            if (
+                hasattr(self, "ssr_script_path")
+                and hasattr(self, "_is_temp_script")
+                and self._is_temp_script
+                and self.ssr_script_path.exists()
+            ):
                 self.ssr_script_path.unlink()
         except:
             pass  # Ignore cleanup errors
