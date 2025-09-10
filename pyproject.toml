@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "flask-react-ssr"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
     {name = "Baraa Khanfar", email = "baraa60@icloud.com"},
 ]
