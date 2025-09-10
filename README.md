@@ -26,7 +26,7 @@ npm --version
 ## Installation
 
 ```bash
-pip install flask-react
+pip install flask-react-ssr
 ```
 
 ## Quick Start

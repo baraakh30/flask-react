@@ -1,11 +1,20 @@
 from setuptools import setup, find_packages
+import os
+
+# Read the contents of README file
+this_directory = os.path.abspath(os.path.dirname(__file__))
+with open(os.path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
 
 setup(
-    name='flask-react',
+    name='flask-react-ssr',
     version='0.1.0',
     description='A Flask extension for server-side React component rendering using Node.js',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author='Baraa Khanfar',
     author_email='baraa60@icloud.com',
+    url='https://github.com/baraakh30/flask-react',
     packages=find_packages(),
     install_requires=[
         'Flask>=2.0.0',

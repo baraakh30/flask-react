@@ -18,7 +18,7 @@ Flask-React is a Flask extension that enables server-side rendering of React com
 ## Installation
 
 ```bash
-pip install flask-react
+pip install flask-react-ssr
 ```
 
 ### Dependencies
@@ -128,7 +128,7 @@ def home():
 
 3. **Install Python dependencies**:
    ```bash
-   pip install flask-react flask
+   pip install flask-react-ssr flask
    ```
 
 4. **Install Node.js dependencies**:
