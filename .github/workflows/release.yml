@@ -55,9 +55,14 @@ jobs:
     - name: Get new version
       id: get_version
       run: |
-        new_version=$(grep 'current_version' .bumpversion.cfg | cut -d' ' -f3)
-        echo "version=$new_version" >> $GITHUB_OUTPUT
-        echo "tag=v$new_version" >> $GITHUB_OUTPUT
+        python -c "
+        import configparser
+        config = configparser.ConfigParser()
+        config.read('.bumpversion.cfg')
+        version = config['bumpversion']['current_version']
+        print(f'version={version}')
+        print(f'tag=v{version}')
+        " >> $GITHUB_OUTPUT
 
     - name: Push changes
       run: |

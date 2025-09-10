@@ -36,8 +36,11 @@ def bump_version(bump_type):
     print("Version bumped successfully!")
 
     # Get new version
-    stdout, _ = run_command("grep 'current_version' .bumpversion.cfg")
-    new_version = stdout.split("=")[1].strip()
+    import configparser
+
+    config = configparser.ConfigParser()
+    config.read(".bumpversion.cfg")
+    new_version = config["bumpversion"]["current_version"]
 
     print(f"New version: {new_version}")
     return new_version
