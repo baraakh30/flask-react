@@ -25,6 +25,9 @@ setup(
             'pytest>=6.0.0',
             'pytest-cov>=2.10.0',
             'black>=21.0.0',
+            'flake8>=4.0.0',
+            'mypy>=0.900',
+            'isort>=5.0.0',
         ]
     },
     entry_points={

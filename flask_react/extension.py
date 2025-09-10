@@ -187,7 +187,7 @@ class FlaskReact:
     
     @property
     def renderer(self):
-        """Get the underlying renderer instance (ReactRenderer or NodeRenderer)."""
+        """Get the underlying renderer instance (NodeRenderer)."""
         if self._renderer is None:
             self._init_renderer()
         return self._renderer
