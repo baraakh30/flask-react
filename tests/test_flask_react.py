@@ -11,8 +11,11 @@ import pytest
 from flask import Flask
 
 from flask_react import FlaskReact, NodeRenderer
-from flask_react.exceptions import (ComponentNotFoundError,
-                                    JavaScriptEngineError, RenderError)
+from flask_react.exceptions import (
+    ComponentNotFoundError,
+    JavaScriptEngineError,
+    RenderError,
+)
 
 
 class TestFlaskReact:

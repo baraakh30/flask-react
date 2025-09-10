@@ -3,8 +3,13 @@ Flask-React Extension
 A Flask extension for server-side React component rendering.
 """
 
-from .exceptions import (ComponentCompileError, ComponentNotFoundError,
-                         FlaskReactError, JavaScriptEngineError, RenderError)
+from .exceptions import (
+    ComponentCompileError,
+    ComponentNotFoundError,
+    FlaskReactError,
+    JavaScriptEngineError,
+    RenderError,
+)
 from .extension import FlaskReact
 from .node_renderer import NodeRenderer
 
