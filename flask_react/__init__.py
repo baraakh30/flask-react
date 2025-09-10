@@ -13,7 +13,7 @@ from .exceptions import (
 from .extension import FlaskReact
 from .node_renderer import NodeRenderer
 
-__version__ = "0.1.0"
+__version__ = "0.1.2"
 __all__ = [
     "FlaskReact",
     "NodeRenderer",

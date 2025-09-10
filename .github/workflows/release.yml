@@ -1,0 +1,89 @@
+name: Automated Release
+
+on:
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - 'README.md'
+      - 'DOCUMENTATION.md'
+      - '.github/**'
+      - 'tests/**'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bump2version build twine
+
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Determine version bump type
+      id: version_type
+      run: |
+        commit_message="${{ github.event.head_commit.message }}"
+        if [[ "$commit_message" == *"BREAKING CHANGE"* ]] || [[ "$commit_message" == *"[major]"* ]]; then
+          echo "bump_type=major" >> $GITHUB_OUTPUT
+        elif [[ "$commit_message" == *"feat:"* ]] || [[ "$commit_message" == *"[minor]"* ]]; then
+          echo "bump_type=minor" >> $GITHUB_OUTPUT
+        else
+          echo "bump_type=patch" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Bump version
+      run: |
+        bump2version ${{ steps.version_type.outputs.bump_type }} --verbose
+
+    - name: Get new version
+      id: get_version
+      run: |
+        new_version=$(grep 'current_version' .bumpversion.cfg | cut -d' ' -f3)
+        echo "version=$new_version" >> $GITHUB_OUTPUT
+        echo "tag=v$new_version" >> $GITHUB_OUTPUT
+
+    - name: Push changes
+      run: |
+        git push origin main
+        git push origin v${{ steps.get_version.outputs.version }}
+
+    - name: Build package
+      run: python -m build
+
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_version.outputs.tag }}
+        release_name: Release ${{ steps.get_version.outputs.tag }}
+        body: |
+          Automated release ${{ steps.get_version.outputs.tag }}
+          
+          Commit: ${{ github.event.head_commit.message }}
+        draft: false
+        prerelease: false
+
+    - name: Publish to PyPI
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.PYPI_API_TOKEN }}
+      run: |
+        twine upload dist/*
