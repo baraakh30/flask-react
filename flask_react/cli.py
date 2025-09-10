@@ -3,32 +3,32 @@ CLI tool for Flask-React extension.
 Provides commands to manage React components.
 """
 
+import argparse
 import os
 import sys
-import argparse
 from pathlib import Path
 
 
-def create_component(name, components_dir='components', template='basic'):
+def create_component(name, components_dir="components", template="basic"):
     """Create a new React component."""
     components_path = Path(components_dir)
     components_path.mkdir(exist_ok=True)
-    
+
     component_file = components_path / f"{name}.jsx"
-    
+
     if component_file.exists():
         print(f"Component '{name}' already exists!")
         return False
-    
+
     templates = {
-        'basic': f"""function {name}({{ children }}) {{
+        "basic": f"""function {name}({{ children }}) {{
     return (
         <div className="{name.lower()}">
             {{children}}
         </div>
     );
 }}""",
-        'page': f"""function {name}({{ title, content }}) {{
+        "page": f"""function {name}({{ title, content }}) {{
     return (
         <div className="page">
             <header>
@@ -44,7 +44,7 @@ def create_component(name, components_dir='components', template='basic'):
         </div>
     );
 }}""",
-        'list': f"""function {name}({{ items, title }}) {{
+        "list": f"""function {name}({{ items, title }}) {{
     return (
         <div className="{name.lower()}">
             {{title && <h2>{{title}}</h2>}}
@@ -62,7 +62,7 @@ def create_component(name, components_dir='components', template='basic'):
         </div>
     );
 }}""",
-        'form': f"""function {name}({{ fields, action, method, title }}) {{
+        "form": f"""function {name}({{ fields, action, method, title }}) {{
     return (
         <div className="form-container">
             {{title && <h2>{{title}}</h2>}}
@@ -100,69 +100,64 @@ def create_component(name, components_dir='components', template='basic'):
             </form>
         </div>
     );
-}}"""
+}}""",
     }
-    
-    component_code = templates.get(template, templates['basic'])
-    
-    with open(component_file, 'w', encoding='utf-8') as f:
+
+    component_code = templates.get(template, templates["basic"])
+
+    with open(component_file, "w", encoding="utf-8") as f:
         f.write(component_code)
-    
+
     print(f"Component '{name}' created successfully at {component_file}")
     return True
 
 
-def list_components(components_dir='components'):
+def list_components(components_dir="components"):
     """List all available components."""
     components_path = Path(components_dir)
-    
+
     if not components_path.exists():
         print(f"Components directory '{components_dir}' does not exist.")
         return
-    
+
     components = []
-    for ext in ['*.jsx', '*.js']:
+    for ext in ["*.jsx", "*.js"]:
         components.extend(components_path.glob(ext))
-    
+
     if not components:
         print("No components found.")
         return
-    
+
     print(f"Components in '{components_dir}':")
     for component in sorted(components):
         print(f"  - {component.stem}")
 
 
-def remove_component(name, components_dir='components'):
+def remove_component(name, components_dir="components"):
     """Remove a React component."""
     components_path = Path(components_dir)
-    
-    for ext in ['.jsx', '.js']:
+
+    for ext in [".jsx", ".js"]:
         component_file = components_path / f"{name}{ext}"
         if component_file.exists():
             component_file.unlink()
             print(f"Component '{name}' removed successfully.")
             return True
-    
+
     print(f"Component '{name}' not found.")
     return False
 
 
-def init_project(project_dir='.'):
+def init_project(project_dir="."):
     """Initialize a new Flask-React project."""
     project_path = Path(project_dir)
-    
+
     # Create directories
-    directories = [
-        'components',
-        'templates',
-        'static/css',
-        'static/js'
-    ]
-    
+    directories = ["components", "templates", "static/css", "static/js"]
+
     for directory in directories:
         (project_path / directory).mkdir(parents=True, exist_ok=True)
-    
+
     # Create basic app.py
     app_content = '''"""
 Flask-React application.
@@ -190,15 +185,15 @@ def home():
 if __name__ == '__main__':
     app.run(debug=True)
 '''
-    
-    app_file = project_path / 'app.py'
+
+    app_file = project_path / "app.py"
     if not app_file.exists():
-        with open(app_file, 'w', encoding='utf-8') as f:
+        with open(app_file, "w", encoding="utf-8") as f:
             f.write(app_content)
         print("Created app.py")
-    
+
     # Create basic HomePage component
-    homepage_content = '''function HomePage({ title, message }) {
+    homepage_content = """function HomePage({ title, message }) {
     return (
         <div className="homepage">
             <header>
@@ -217,26 +212,26 @@ if __name__ == '__main__':
             </main>
         </div>
     );
-}'''
-    
-    homepage_file = project_path / 'components' / 'HomePage.jsx'
+}"""
+
+    homepage_file = project_path / "components" / "HomePage.jsx"
     if not homepage_file.exists():
-        with open(homepage_file, 'w', encoding='utf-8') as f:
+        with open(homepage_file, "w", encoding="utf-8") as f:
             f.write(homepage_content)
         print("Created components/HomePage.jsx")
-    
+
     # Create requirements.txt
-    requirements_content = '''Flask>=2.0.0
+    requirements_content = """Flask>=2.0.0
 flask-react>=0.1.0
 PyExecJS>=1.5.1
-'''
-    
-    requirements_file = project_path / 'requirements.txt'
+"""
+
+    requirements_file = project_path / "requirements.txt"
     if not requirements_file.exists():
-        with open(requirements_file, 'w', encoding='utf-8') as f:
+        with open(requirements_file, "w", encoding="utf-8") as f:
             f.write(requirements_content)
         print("Created requirements.txt")
-    
+
     print(f"Flask-React project initialized in '{project_dir}'")
     print("Next steps:")
     print("  1. Install dependencies: pip install -r requirements.txt")
@@ -246,44 +241,54 @@ PyExecJS>=1.5.1
 
 def main():
     """Main CLI entry point."""
-    parser = argparse.ArgumentParser(description='Flask-React CLI tool')
-    subparsers = parser.add_subparsers(dest='command', help='Available commands')
-    
+    parser = argparse.ArgumentParser(description="Flask-React CLI tool")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
+
     # Create component command
-    create_parser = subparsers.add_parser('create', help='Create a new React component')
-    create_parser.add_argument('name', help='Component name')
-    create_parser.add_argument('--dir', default='components', help='Components directory')
-    create_parser.add_argument('--template', choices=['basic', 'page', 'list', 'form'], 
-                              default='basic', help='Component template')
-    
+    create_parser = subparsers.add_parser("create", help="Create a new React component")
+    create_parser.add_argument("name", help="Component name")
+    create_parser.add_argument(
+        "--dir", default="components", help="Components directory"
+    )
+    create_parser.add_argument(
+        "--template",
+        choices=["basic", "page", "list", "form"],
+        default="basic",
+        help="Component template",
+    )
+
     # List components command
-    list_parser = subparsers.add_parser('list', help='List all components')
-    list_parser.add_argument('--dir', default='components', help='Components directory')
-    
+    list_parser = subparsers.add_parser("list", help="List all components")
+    list_parser.add_argument("--dir", default="components", help="Components directory")
+
     # Remove component command
-    remove_parser = subparsers.add_parser('remove', help='Remove a component')
-    remove_parser.add_argument('name', help='Component name')
-    remove_parser.add_argument('--dir', default='components', help='Components directory')
-    
+    remove_parser = subparsers.add_parser("remove", help="Remove a component")
+    remove_parser.add_argument("name", help="Component name")
+    remove_parser.add_argument(
+        "--dir", default="components", help="Components directory"
+    )
+
     # Initialize project command
-    init_parser = subparsers.add_parser('init', help='Initialize a new Flask-React project')
-    init_parser.add_argument('--dir', default='.', help='Project directory')
-    
+    init_parser = subparsers.add_parser(
+        "init", help="Initialize a new Flask-React project"
+    )
+    init_parser.add_argument("--dir", default=".", help="Project directory")
+
     args = parser.parse_args()
-    
+
     if not args.command:
         parser.print_help()
         return
-    
-    if args.command == 'create':
+
+    if args.command == "create":
         create_component(args.name, args.dir, args.template)
-    elif args.command == 'list':
+    elif args.command == "list":
         list_components(args.dir)
-    elif args.command == 'remove':
+    elif args.command == "remove":
         remove_component(args.name, args.dir)
-    elif args.command == 'init':
+    elif args.command == "init":
         init_project(args.dir)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
